@@ -17,11 +17,21 @@ const Package = ({pkg, pkgs}) => {
 
     // Link to package if it exists in file.
     const dependentPackages = (dep) => {
-        return (
-            pkgs.get(dep) 
-                ? <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>
-                : <p key={dep}>{dep}</p>
-        )
+        if (dep.indexOf('|') > -1) {
+            let valid = dep.split(' | ').find(alt => pkgs.get(alt) !== undefined)
+            if (valid) {
+                const other = dep.substring(0, dep.indexOf(valid)) + dep.substring(dep.indexOf(valid) + valid.length)
+                return <p><Link to={`/pkg/${valid}`}>{valid}</Link>{other}</p>
+            } else {
+                return <p key={dep}>{dep}</p>
+            }
+        } else {
+            return (
+                pkgs.get(dep) 
+                    ? <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>
+                    : <p key={dep}>{dep}</p>
+            )
+        }
     }
 
     return (

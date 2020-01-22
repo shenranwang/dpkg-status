@@ -28,13 +28,28 @@ const FetchStates = Object.freeze({
     return object;
   };
 
+  // Alternate dependencies on one line, versions removed and dependencies separated by |.
+  const formatAlternates = (dep) => {
+    return dep.split('| ').map(alt => (alt.indexOf(' (') > -1) ? alt.substring(0, alt.indexOf(' ')) : alt).join(' | ')
+  }
+
   // Reformat depends field of a package from string to array, and add reverse-depends field to object.
   const formatDependencies = (pkg) => {
     if (pkg.depends === undefined) {
       pkg.depends = [];
     } else if (pkg.depends.indexOf(',') > -1) {
       let tmp = pkg.depends.split(', ');
-      tmp = tmp.map(dep => (dep.indexOf(' ') > -1) ? dep.substring(0, dep.indexOf(' ')) : dep);
+      tmp = tmp.map(dep => {
+        if (dep.indexOf(' (') > -1) {
+          if (dep.indexOf('|') > -1) {
+            return formatAlternates(dep)
+          } else {
+            return dep.substring(0, dep.indexOf(' '))
+          }
+        } else {
+          return dep
+        }
+      });
       pkg.depends = Array.from(new Set(tmp));
     } else {
       pkg.depends.indexOf(' ') > -1 
@@ -87,7 +102,6 @@ const App = () => {
 
     pkgs = addReverseDependencies(pkgMap);
 
-    // TODO: Alternates
     return pkgs;
   }, [objectify]);
 
