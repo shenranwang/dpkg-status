@@ -5,9 +5,16 @@ import Package from './components/Package';
 import Packages from './components/Packages';
 import NoMatchPage from './components/NoMatchPage'
 
+  const FetchStates = Object.freeze({
+    FETCHING: 'FETCHING',
+    SUCCESS: 'SUCCESS',
+    ERROR: 'ERROR'
+  });
+
 const App = () => {
 
   const [packages, setPackages] = useState([]);
+  const [fetchState, setFetchState] = useState(FetchStates.FETCHING)
 
   const pkgById = (name) => packages.find(p => p.package === name);
 
@@ -86,33 +93,45 @@ const App = () => {
 
   // Fetch sample file data through GitHub Gists API.
   const getData = useCallback(async () => {
-    await fetch('https://api.github.com/gists/29735158335170c27297422a22b48caa')
+    try {
+      await fetch('https://api.github.com/gists/29735158335170c27297422a22b48caa')
       .then(results => {
         return results.json();
       })
       .then(data => {
         setPackages(organizePackages(data.files["status.real"].content));
+        setFetchState(FetchStates.SUCCESS)
       });
+    } catch (error) {
+      console.log(error.message)
+      setFetchState(FetchStates.ERROR)
+    }
+    
   }, [organizePackages]);
 
   useEffect(() => {
     getData();
   }, [getData]);
 
-  return (
-    <Router>
-      <div>
-        <Switch>
-          <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
-          <Route exact path='/pkg/:name' render={({ match }) =>
-            <Package pkg={pkgById(match.params.name)}/>}
-          />
-          <Route component={NoMatchPage} />
-        </Switch>
-      </div>      
-    </Router>
-
-  );
+  if (fetchState === FetchStates.SUCCESS) {
+    return (
+      <Router>
+        <div>
+          <Switch>
+            <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
+            <Route exact path='/pkg/:name' render={({ match }) =>
+              <Package pkg={pkgById(match.params.name)}/>}
+            />
+            <Route component={NoMatchPage} />
+          </Switch>
+        </div>      
+      </Router>
+    );
+  } else if (fetchState === FetchStates.FETCHING) {
+    return <div>Loading...</div>
+  } else {
+    return <div><NoMatchPage message="Error fetching file!"/></div> 
+  }
 };
 
 export default App;
