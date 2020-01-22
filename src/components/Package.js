@@ -6,12 +6,13 @@ const Package = ({pkg, pkgs}) => {
 
     // Show description based on whether data type is string or array (of strings).
     const showDescription = () => {
+        const keys = pkg.description.map((line, i) => [line, i])
         return typeof pkg.description === 'string' 
             ? <h3>{pkg.description}</h3>
             :
             <>
                 <h3>{pkg.description[0]}</h3>
-                {pkg.description.slice(1).map(line => <div key={line}>{line}</div>)}
+                {keys.slice(1).map(line => <div key={line[1]}>{line[0]}</div>)}
             </>
     }
 
@@ -21,7 +22,7 @@ const Package = ({pkg, pkgs}) => {
             let valid = dep.split(' | ').find(alt => pkgs.get(alt) !== undefined)
             if (valid) {
                 const other = dep.substring(0, dep.indexOf(valid)) + dep.substring(dep.indexOf(valid) + valid.length)
-                return <p><Link to={`/pkg/${valid}`}>{valid}</Link>{other}</p>
+                return <p key={dep}><Link to={`/pkg/${valid}`}>{valid}</Link>{other}</p>
             } else {
                 return <p key={dep}>{dep}</p>
             }
@@ -36,7 +37,11 @@ const Package = ({pkg, pkgs}) => {
 
     return (
         pkg ? <Route path={`/pkg/${pkg.package}`}>
-                <Link to={`/`}>Index Page</Link>
+                <p> 
+                    {pkg.prev ? <Link to={`/pkg/${pkg.prev}`}>{`<<${pkg.prev}`}</Link> : null}                  
+                    <d> </d><Link to={`/`}>Index Page</Link><d> </d>     
+                    {pkg.next ? <Link to={`/pkg/${pkg.next}`}>{`${pkg.next}>>`}</Link> : null}
+                </p>
                 <h1>{pkg.package}</h1>
                 <h2>Description</h2>
                 {showDescription()}

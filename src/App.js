@@ -11,67 +11,79 @@ const FetchStates = Object.freeze({
   ERROR: 'ERROR'
 });
 
-  // Fit key-value pairs into one object. Takes into consideration fields with multiple lines.
-  const toObject = (lines) => {
-    let object = {};
-    let lastKey;
-    for (let i = 0; i < lines.length; ++i) {
-      if (lines[i][0][0] === " ") {
-        object[lastKey] = [object[lastKey]]
-        const line = lines[i][0] === " ." ? "" : lines[i][0]
-        object[lastKey] = object[lastKey].concat(line).flat();
-      } else {
-        lastKey = lines[i][0].toLowerCase();
-        object[lastKey] = lines[i][1];
-      }
-    }
-    return object;
-  };
+// Find adjacent packages for navigation purposes.
+const findAdjacents = (pkgs) => {
+  return pkgs.map((obj, i) => {
+    let adj = obj
+    const prev = pkgs[i - 1]
+    const next = pkgs[i + 1]
+    if (prev) adj.prev = prev.package
+    if (next) adj.next = next.package
+    return adj
+  })
+}
 
-  // Alternate dependencies on one line, versions removed and dependencies separated by |.
-  const formatAlternates = (dep) => {
-    return dep.split('| ').map(alt => (alt.indexOf(' (') > -1) ? alt.substring(0, alt.indexOf(' ')) : alt).join(' | ')
-  }
-
-  // Reformat depends field of a package from string to array, and add reverse-depends field to object.
-  const formatDependencies = (pkg) => {
-    if (pkg.depends === undefined) {
-      pkg.depends = [];
-    } else if (pkg.depends.indexOf(',') > -1) {
-      let tmp = pkg.depends.split(', ');
-      tmp = tmp.map(dep => {
-        if (dep.indexOf(' (') > -1) {
-          if (dep.indexOf('|') > -1) {
-            return formatAlternates(dep)
-          } else {
-            return dep.substring(0, dep.indexOf(' '))
-          }
-        } else {
-          return dep
-        }
-      });
-      pkg.depends = Array.from(new Set(tmp));
+// Fit key-value pairs into one object. Takes into consideration fields with multiple lines.
+const toObject = (lines) => {
+  let object = {};
+  let lastKey;
+  for (let i = 0; i < lines.length; ++i) {
+    if (lines[i][0][0] === " ") {
+      object[lastKey] = [object[lastKey]]
+      const line = lines[i][0] === " ." ? "" : lines[i][0]
+      object[lastKey] = object[lastKey].concat(line).flat();
     } else {
-      pkg.depends.indexOf(' ') > -1 
-        ? pkg.depends = [pkg.depends.substring(0, pkg.depends.indexOf(' '))]
-        : pkg.depends = [pkg.depends];
-    };
-    pkg['reverse-depends'] = [];
-    return pkg;
-  };
+      lastKey = lines[i][0].toLowerCase();
+      object[lastKey] = lines[i][1];
+    }
+  }
+  return object;
+};
 
-  // Add the package as a reverse dependency in packages dependent on it.
-  const addReverseDependencies = (pkgMap) => {
-    pkgMap.forEach((value, key, map) => {
-      value.depends.forEach((pkg) => {
-          if (pkg.length !== 0) {
-          let object = pkgMap.get(pkg);
-          if (object) object['reverse-depends'] = object['reverse-depends'].concat(key);
-        }   
-      });
+// Alternate dependencies on one line, versions removed and dependencies separated by |.
+const formatAlternates = (dep) => {
+  return dep.split('| ').map(alt => (alt.indexOf(' (') > -1) ? alt.substring(0, alt.indexOf(' ')) : alt).join(' | ')
+}
+
+// Reformat depends field of a package from string to array, and add reverse-depends field to object.
+const formatDependencies = (pkg) => {
+  if (pkg.depends === undefined) {
+    pkg.depends = [];
+  } else if (pkg.depends.indexOf(',') > -1) {
+    let tmp = pkg.depends.split(', ');
+    tmp = tmp.map(dep => {
+      if (dep.indexOf(' (') > -1) {
+        if (dep.indexOf('|') > -1) {
+          return formatAlternates(dep)
+        } else {
+          return dep.substring(0, dep.indexOf(' '))
+        }
+      } else {
+        return dep
+      }
     });
-    return pkgMap;
+    pkg.depends = Array.from(new Set(tmp));
+  } else {
+    pkg.depends.indexOf(' ') > -1 
+      ? pkg.depends = [pkg.depends.substring(0, pkg.depends.indexOf(' '))]
+      : pkg.depends = [pkg.depends];
   };
+  pkg['reverse-depends'] = [];
+  return pkg;
+};
+
+// Add the package as a reverse dependency in packages dependent on it.
+const addReverseDependencies = (pkgMap) => {
+  pkgMap.forEach((value, key, map) => {
+    value.depends.forEach((pkg) => {
+        if (pkg.length !== 0) {
+        let object = pkgMap.get(pkg);
+        if (object) object['reverse-depends'] = object['reverse-depends'].concat(key);
+      }   
+    });
+  });
+  return pkgMap;
+};
 
 const App = () => {
 
@@ -96,11 +108,15 @@ const App = () => {
       .map(pkg => objectify(pkg))
       .map(pkg => formatDependencies(pkg));
 
+    pkgs = findAdjacents(pkgs)
+
     // Turn into map with name of package (key) and JSON object (value)
     // Add reverse dependencies and turn back into array
     let pkgMap = new Map(pkgs.map(pkg => [pkg.package, pkg]));
 
     pkgs = addReverseDependencies(pkgMap);
+
+    console.log(pkgs)
 
     return pkgs;
   }, [objectify]);
