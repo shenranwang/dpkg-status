@@ -113,19 +113,26 @@ const App = () => {
     getData();
   }, [getData]);
 
-  return (
-    <Router>
-      <div>
-        <Switch>
-          <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
-          <Route exact path='/pkg/:name' render={({ match }) =>
-            <Package pkg={pkgById(match.params.name)}/>}
-          />
-          <Route component={NoMatchPage} />
-        </Switch>
-      </div>      
-    </Router>
-  );
+  if (fetchState === FetchStates.SUCCESS) {
+    return (
+      <Router>
+        <div>
+          <Switch>
+            <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
+            <Route exact path='/pkg/:name' render={({ match }) =>
+              <Package pkg={pkgById(match.params.name)}/>}
+            />
+            <Route component={NoMatchPage} />
+          </Switch>
+        </div>      
+      </Router>
+    );
+  } else if (fetchState === FetchStates.FETCHING) {
+    return <div>Loading...</div>
+  } else {
+    return <div><NoMatchPage message="Error fetching file!"/></div>
+  }
+
 };
 
 export default App;
