@@ -5,18 +5,11 @@ import Package from './components/Package';
 import Packages from './components/Packages';
 import NoMatchPage from './components/NoMatchPage'
 
-  const FetchStates = Object.freeze({
-    FETCHING: 'FETCHING',
-    SUCCESS: 'SUCCESS',
-    ERROR: 'ERROR'
-  });
-
-const App = () => {
-
-  const [packages, setPackages] = useState([]);
-  const [fetchState, setFetchState] = useState(FetchStates.FETCHING)
-
-  const pkgById = (name) => packages.find(p => p.package === name);
+const FetchStates = Object.freeze({
+  FETCHING: 'FETCHING',
+  SUCCESS: 'SUCCESS',
+  ERROR: 'ERROR'
+});
 
   // Fit key-value pairs into one object. Takes into consideration fields with multiple lines.
   const toObject = (lines) => {
@@ -34,12 +27,6 @@ const App = () => {
     }
     return object;
   };
-
-  // Split each string in array into arrays by new line and
-  // turn related data into JSON object.
-  const objectify = useCallback((pkg) => {
-    return toObject(pkg.split("\n").map(line => line.split(": ")));
-  }, []);
 
   // Reformat depends field of a package from string to array, and add reverse-depends field to object.
   const formatDependencies = (pkg) => {
@@ -71,6 +58,19 @@ const App = () => {
     return pkgMap;
   };
 
+const App = () => {
+
+  const [packages, setPackages] = useState(new Map());
+  const [fetchState, setFetchState] = useState(FetchStates.FETCHING)
+
+  const pkgById = (name) => Array.from(packages.values()).find(p => p.package === name);
+
+  // Split each string in array into arrays by new line and
+  // turn related data into JSON object.
+  const objectify = useCallback((pkg) => {
+    return toObject(pkg.split("\n").map(line => line.split(": ")));
+  }, []);
+
   // Organize data into object format.
   const organizePackages = useCallback((content) => {
     // Sort data into array by empty line and remove empty string in final element of array
@@ -85,7 +85,7 @@ const App = () => {
     // Add reverse dependencies and turn back into array
     let pkgMap = new Map(pkgs.map(pkg => [pkg.package, pkg]));
 
-    pkgs = Array.from(addReverseDependencies(pkgMap).values());
+    pkgs = addReverseDependencies(pkgMap);
 
     // TODO: Alternates
     return pkgs;
@@ -118,9 +118,9 @@ const App = () => {
       <Router>
         <div>
           <Switch>
-            <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
+            <Route exact path='/' render={() =><Packages pkgs={Array.from(packages.values())}/>} />
             <Route exact path='/pkg/:name' render={({ match }) =>
-              <Package pkg={pkgById(match.params.name)}/>}
+              <Package pkg={pkgById(match.params.name)} pkgs={packages} />}
             />
             <Route component={NoMatchPage} />
           </Switch>

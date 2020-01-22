@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Link } from 'react-router-dom';
 import NoMatchPage from './NoMatchPage'
 
-const Package = ({pkg}) => {
+const Package = ({pkg, pkgs}) => {
 
     // Show description based on whether data type is string or array (of strings).
     const showDescription = () => {
@@ -15,15 +15,25 @@ const Package = ({pkg}) => {
             </>
     }
 
+    // Link to package if it exists in file.
+    const dependentPackages = (dep) => {
+        return (
+            pkgs.get(dep) 
+                ? <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>
+                : <p key={dep}>{dep}</p>
+        )
+    }
+
     return (
         pkg ? <Route path={`/pkg/${pkg.package}`}>
+                <Link to={`/`}>Index Page</Link>
                 <h1>{pkg.package}</h1>
                 <h2>Description</h2>
                 {showDescription()}
                 <h2>Dependencies</h2>
-                {pkg.depends.map(dep => <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>)}
+                {pkg.depends.map(dep => dependentPackages(dep))}
                 <h2>Reverse Dependencies</h2>
-                {pkg['reverse-depends'].map(dep => <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>)}
+                {pkg['reverse-depends'].map(dep => dependentPackages(dep))}
             </Route>      
             : <NoMatchPage message="Package does not exist in /var/lib/dpkg/status."/>      
     )
