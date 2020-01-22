@@ -16,14 +16,14 @@ const Package = ({pkg}) => {
     }
 
     return (
-        pkg ? <Route path={`/pkg/${pkg.package}`}>
+        pkg ? <Route path={`/${pkg.package}`}>
                 <h1>{pkg.package}</h1>
                 <h2>Description</h2>
                 {showDescription()}
                 <h2>Dependencies</h2>
-                {pkg.depends.map(dep => <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>)}
+                {pkg.depends.map(dep => <p key={dep}><Link to={`/${dep}`}>{dep}</Link></p>)}
                 <h2>Reverse Dependencies</h2>
-                {pkg['reverse-depends'].map(dep => <p key={dep}><Link to={`/pkg/${dep}`}>{dep}</Link></p>)}
+                {pkg['reverse-depends'].map(dep => <p key={dep}><Link to={`/${dep}`}>{dep}</Link></p>)}
             </Route>      
             : <NoMatchPage message="Package does not exist in /var/lib/dpkg/status."/>      
     )

@@ -118,7 +118,7 @@ const App = () => {
         <div>
           <Switch>
             <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
-            <Route exact path='/pkg/:name' render={({ match }) =>
+            <Route exact path='/:name' render={({ match }) =>
               <Package pkg={pkgById(match.params.name)}/>}
             />
             <Route component={NoMatchPage} />
