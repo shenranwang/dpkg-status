@@ -21,7 +21,7 @@ const Packages = ({pkgs}) => {
             <Filter newFilter={filter} handleFilterChange={handleFilterChange}/>
             {show().map(pkg =>           
                 <p key={pkg.package}>
-                    <Link to={`/${pkg.package}`}>{pkg.package}</Link>
+                    <Link to={`/pkg/${pkg.package}`}>{pkg.package}</Link>
                 </p>
             )}
         </div>

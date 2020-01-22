@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import './App.css';
 import Package from './components/Package';
 import Packages from './components/Packages';
 import NoMatchPage from './components/NoMatchPage'
@@ -112,25 +113,19 @@ const App = () => {
     getData();
   }, [getData]);
 
-  if (fetchState === FetchStates.SUCCESS) {
-    return (
-      <Router>
-        <div>
-          <Switch>
-            <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
-            <Route exact path='/:name' render={({ match }) =>
-              <Package pkg={pkgById(match.params.name)}/>}
-            />
-            <Route component={NoMatchPage} />
-          </Switch>
-        </div>      
-      </Router>
-    );
-  } else if (fetchState === FetchStates.FETCHING) {
-    return <div>Loading...</div>
-  } else {
-    return <div><NoMatchPage message="Error fetching file!"/></div> 
-  }
+  return (
+    <Router>
+      <div>
+        <Switch>
+          <Route exact path='/' render={() =><Packages pkgs={packages}/>} />
+          <Route exact path='/pkg/:name' render={({ match }) =>
+            <Package pkg={pkgById(match.params.name)}/>}
+          />
+          <Route component={NoMatchPage} />
+        </Switch>
+      </div>      
+    </Router>
+  );
 };
 
 export default App;
