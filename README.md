@@ -2,7 +2,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Heroku
 
-https://reaktor2020.herokuapp.com/
+https://dpkg-status-reaktor.herokuapp.com/
 
 ## Available Scripts
 
