@@ -115,9 +115,7 @@ const App = () => {
     let pkgMap = new Map(pkgs.map(pkg => [pkg.package, pkg]));
 
     pkgs = addReverseDependencies(pkgMap);
-
-    console.log(pkgs)
-
+    
     return pkgs;
   }, [objectify]);
 

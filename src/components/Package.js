@@ -39,7 +39,7 @@ const Package = ({pkg, pkgs}) => {
         pkg ? <Route path={`/pkg/${pkg.package}`}>
                 <p> 
                     {pkg.prev ? <Link to={`/pkg/${pkg.prev}`}>{`<<${pkg.prev}`}</Link> : null}                  
-                    <d> </d><Link to={`/`}>Index Page</Link><d> </d>     
+                    <div> </div><Link to={`/`}>Index Page</Link><div> </div>     
                     {pkg.next ? <Link to={`/pkg/${pkg.next}`}>{`${pkg.next}>>`}</Link> : null}
                 </p>
                 <h1>{pkg.package}</h1>
