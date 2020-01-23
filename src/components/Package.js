@@ -2,9 +2,18 @@ import React from 'react';
 import { Route, Link } from 'react-router-dom';
 import NoMatchPage from './NoMatchPage'
 
+/**
+ * Renders view of a package, which includes
+ * the name of the package, its description,
+ * dependencies and reverse dependencies.
+ * 
+ * @param {Object} pkg - JSON object which contains package data.
+ * @param {Map<Object>} pkgs - Map of package name (key) to corresponding object (value).
+ */
 const Package = ({pkg, pkgs}) => {
 
-    // Show description based on whether data type is string or array (of strings).
+    // Show appropriate description based on whether
+    // data type is string or array (of strings).
     const showDescription = () => {
         let keys = typeof pkg.description !== 'string' ? pkg.description.map((line, i) => [line, i]) : pkg.description
         return typeof pkg.description === 'string' 
@@ -19,6 +28,8 @@ const Package = ({pkg, pkgs}) => {
     // Link to package if it exists in file.
     const dependentPackages = (dep) => {
         if (dep.indexOf('|') > -1) {
+            // Alternate dependecies are on the same line;
+            // provides link to one or no packages.
             let valid = dep.split(' | ').find(alt => pkgs.get(alt) !== undefined)
             if (valid) {
                 const other = dep.substring(0, dep.indexOf(valid)) + dep.substring(dep.indexOf(valid) + valid.length)

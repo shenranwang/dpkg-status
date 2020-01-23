@@ -11,7 +11,12 @@ const FetchStates = Object.freeze({
   ERROR: 'ERROR'
 });
 
-// Find adjacent packages for navigation purposes.
+/**
+ * Find adjacent packages for navigation purposes.
+ * Returns array of packages as JSON objects with adjacents added to them.
+ * 
+ * @param {Array<Object>} pkgs - Array of packages as JSON objects.
+ */
 const findAdjacents = (pkgs) => {
   return pkgs.map((obj, i) => {
     let adj = obj
@@ -23,7 +28,13 @@ const findAdjacents = (pkgs) => {
   })
 }
 
-// Fit key-value pairs into one object. Takes into consideration fields with multiple lines.
+/**
+ * Fit key-value pairs into one object. 
+ * Takes into consideration fields with multiple lines.
+ * Returns a package as a JSON object.
+ * 
+ * @param {Array<String>} lines - Array of strings that make up the data of one package.
+ */
 const toObject = (lines) => {
   let object = {};
   let lastKey;
@@ -40,12 +51,23 @@ const toObject = (lines) => {
   return object;
 };
 
-// Alternate dependencies on one line, versions removed and dependencies separated by |.
+/**
+ * Alternate dependencies on one line, 
+ * versions removed and dependencies separated by |.
+ * 
+ * @param {String} dep - Alternate dependencies on one line separated by |.
+ */
 const formatAlternates = (dep) => {
   return dep.split('| ').map(alt => (alt.indexOf(' (') > -1) ? alt.substring(0, alt.indexOf(' ')) : alt).join(' | ')
 }
 
-// Reformat depends field of a package from string to array, and add reverse-depends field to object.
+/**
+ * Reformat depends field of a package from string to
+ * array, and add reverse-depends field to object.
+ * Returns package as a JSON object.
+ * 
+ * @param {Object} pkg - Package as a JSON object.
+ */
 const formatDependencies = (pkg) => {
   if (pkg.depends === undefined) {
     pkg.depends = [];
@@ -72,7 +94,13 @@ const formatDependencies = (pkg) => {
   return pkg;
 };
 
-// Add the package as a reverse dependency in packages dependent on it.
+/**
+ * Add the package as a reverse dependency 
+ * in packages dependent on it.
+ * Returns modified map of pkgMap.
+ * 
+ * @param {Map<Object>} pkgMap - Map of package name (key) to corresponding object (value).
+ */
 const addReverseDependencies = (pkgMap) => {
   pkgMap.forEach((value, key, map) => {
     value.depends.forEach((pkg) => {
@@ -100,23 +128,25 @@ const App = () => {
 
   // Organize data into object format.
   const organizePackages = useCallback((content) => {
-    // Sort data into array by empty line and remove empty string in final element of array
-    // Turn into JSON object
-    // Turn depends field from string to array
+    // Sort data into array by empty line and 
+    // remove empty string in final element of array.
+    // Turn into JSON object.
+    // Turn depends field from string to array.
     let pkgs = content
       .split("\n\n").slice(0, -1).sort()
       .map(pkg => objectify(pkg))
       .map(pkg => formatDependencies(pkg));
 
+    // Find and add alphabetically adjacent packages to the object. 
     pkgs = findAdjacents(pkgs)
 
-    // Turn into map with name of package (key) and JSON object (value)
-    // Add reverse dependencies and turn back into array
+    // Turn into map with name of package (key) and JSON object (value).
     let pkgMap = new Map(pkgs.map(pkg => [pkg.package, pkg]));
 
-    pkgs = addReverseDependencies(pkgMap);
-    
-    return pkgs;
+    // Add reverse dependencies and turn back into array.
+    pkgMap = addReverseDependencies(pkgMap);
+
+    return pkgMap;
   }, [objectify]);
 
   // Fetch sample file data through GitHub Gists API.
