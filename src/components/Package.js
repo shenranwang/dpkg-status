@@ -6,7 +6,7 @@ const Package = ({pkg, pkgs}) => {
 
     // Show description based on whether data type is string or array (of strings).
     const showDescription = () => {
-        const keys = pkg.description.map((line, i) => [line, i])
+        let keys = typeof pkg.description !== 'string' ? pkg.description.map((line, i) => [line, i]) : pkg.description
         return typeof pkg.description === 'string' 
             ? <h3>{pkg.description}</h3>
             :
@@ -37,11 +37,11 @@ const Package = ({pkg, pkgs}) => {
 
     return (
         pkg ? <Route path={`/pkg/${pkg.package}`}>
-                <p> 
+                <div> 
                     {pkg.prev ? <Link to={`/pkg/${pkg.prev}`}>{`<<${pkg.prev}`}</Link> : null}                  
-                    <div> </div><Link to={`/`}>Index Page</Link><div> </div>     
+                    <br></br><Link to={`/`}>Index Page</Link><br></br>
                     {pkg.next ? <Link to={`/pkg/${pkg.next}`}>{`${pkg.next}>>`}</Link> : null}
-                </p>
+                </div>
                 <h1>{pkg.package}</h1>
                 <h2>Description</h2>
                 {showDescription()}
