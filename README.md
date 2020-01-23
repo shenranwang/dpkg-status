@@ -10,13 +10,9 @@ Each name is linked to a package-specific page, which contains more information 
 * Description
 * Dependencies
 * Reverse dependencies
-<<<<<<< HEAD
 
 Dependencies separated by | on the same line indicate alternate dependencies.
 
-=======
-Dependencies separated by | on the same line indicate alternate dependencies.
->>>>>>> 4dd5fcdb8fc94d6136513e974d6313fa09fd029b
 The user is able to navigate through the package structure by clicking on dependencies and reverse dependencies. The user can also navigate to packages alphabetically adjacent to the package currently being observed and back to the index page. 
 
 ### `npm start`
