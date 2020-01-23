@@ -2,6 +2,19 @@
 
 https://dpkg-status-reaktor.herokuapp.com/
 
+The web application provides information about packages from a sample file based on the var/lib/dpkg/status file on Debian and Ubuntu systems. The sample file is fetched via the Gists API.
+
+The index page lists the names installed packages in alphabetical order. The user may filter the packages appearing on the screen with the input field provided on the page.
+
+Each name is linked to a package-specific page, which contains more information about the package:
+* Description
+* Dependencies
+* Reverse dependencies
+
+Dependencies separated by | on the same line indicate alternate dependencies.
+
+The user is able to navigate through the package structure by clicking on dependencies and reverse dependencies. The user can also navigate to packages alphabetically adjacent to the package currently being observed and back to the index page. 
+
 ### `npm start`
 
 Runs the app in the development mode.<br />
