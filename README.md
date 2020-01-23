@@ -1,6 +1,4 @@
-## Heroku
-
-https://dpkg-status-reaktor.herokuapp.com/
+# Documentation
 
 The web application provides information about packages from a sample file based on the var/lib/dpkg/status file on Debian and Ubuntu systems. The sample file is fetched via the Gists API.
 
@@ -14,6 +12,10 @@ Each name is linked to a package-specific page, which contains more information 
 Dependencies separated by | on the same line indicate alternate dependencies.
 
 The user is able to navigate through the package structure by clicking on dependencies and reverse dependencies. The user can also navigate to packages alphabetically adjacent to the package currently being observed and back to the index page. 
+
+## Heroku
+
+https://dpkg-status-reaktor.herokuapp.com/
 
 ### `npm start`
 
