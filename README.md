@@ -15,7 +15,7 @@ The user is able to navigate through the package structure by clicking on depend
 
 ## Heroku
 
-https://dpkg-status-reaktor.herokuapp.com/
+https://dpkg-status-data.herokuapp.com/
 
 ### `npm start`
 
